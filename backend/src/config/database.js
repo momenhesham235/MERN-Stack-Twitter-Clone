@@ -18,7 +18,7 @@ class DatabaseSingleton {
 
       if (!uri) throw new Error("❌ MONGO_URI missing in .env");
 
-      const conn = await mongoose.connect(uri);
+      const conn = await mongoose.connect(uri );
       console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (err) {
       console.error("❌ MongoDB Connection Error:", err.message);
