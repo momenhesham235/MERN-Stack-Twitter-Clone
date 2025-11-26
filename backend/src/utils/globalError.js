@@ -1,4 +1,4 @@
-import STATUS from "../utils/httpStatusText.js";
+import STATUS from "./httpStatusText.js";
 
 const globalError = (error, req, res, next) => {
   res.status(error.httpStatusCode || 500).send({
@@ -9,4 +9,4 @@ const globalError = (error, req, res, next) => {
   });
 };
 
-module.exports = globalError;
+export default globalError;

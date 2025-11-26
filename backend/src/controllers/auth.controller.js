@@ -66,7 +66,6 @@ export const signup = asyncHandler(async (req, res) => {
 
 });
 
-
 /**---------------------------------------
  * @desc    Login User
  * @route    /api/v1/auth/login
@@ -122,7 +121,6 @@ const { identifier, password } = req.body; // identifier = username or email
      
 });
 
-
 /**---------------------------------------
  * @desc    Logout User
  * @route    /api/v1/auth/logout
@@ -135,7 +133,12 @@ export const logout = asyncHandler(async (req, res) => {
 		res.status(200).json({ message: "Logged out successfully" });
 });
 
-
+/**---------------------------------------
+ * @desc    Get Current User Profile
+ * @route    /api/v1/auth/me
+ * @method   GET
+ * @access   Private
+ ------------------------------------*/
 export const getMe = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id).select("-password");
     if (!user) {

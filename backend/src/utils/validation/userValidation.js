@@ -39,8 +39,16 @@ const validateLoginUser = (obj) => {
 const validateUpdateUser = (obj) => {
   const schema = joi.object({
     username: joi.string().trim().min(3).max(30),
-    password: joi.string().trim().min(8),
-    bio: joi.string().trim().max(200),
+    fullName: joi.string().trim().min(3).max(50),
+    email: joi.string().trim().email().required(),
+    currentPassword: joi.string().trim().min(8).messages({
+      "string.min": "Current password must be at least 8 characters",
+    }),
+    newPassword: joi.string().trim().min(8).messages({ 
+       "string.min": "New password must be at least 8 characters" 
+      }),
+    bio: joi.string().trim().max(160).allow(''),
+    link: joi.string().uri().trim().allow(''),
   });
 
   return schema.validate(obj);
