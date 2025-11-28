@@ -1,4 +1,4 @@
-import STATUS from "../../utils/httpStatusText.js";
+import STATUS from "../../utils/http.status.text.js";
 
 const notFound = (req, res) => {
   res.status(404).json({
@@ -6,7 +6,6 @@ const notFound = (req, res) => {
     message: "Route not found",
     statusCode: 404,
     timestamp: new Date().toISOString(),
-
   });
 };
 

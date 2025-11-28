@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { signup, login, logout , getMe } from "../../controllers/auth.controller.js";
-import protectRoute  from "../../middlewares/protectRoute.js";
+import protectRoute  from "../../middlewares/protect.route.js";
 
 export const authRoutes = Router();
 

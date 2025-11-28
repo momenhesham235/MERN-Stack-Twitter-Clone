@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from "dotenv";
 import cookieParser from 'cookie-parser';
-import mainRouters from './src/routes/indexRouter.js';
+import mainRouters from './src/routes/index.router.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Load env first
@@ -19,7 +19,6 @@ app.use(cookieParser()); // For parsing cookies in requests
 
 
 // Cloudinary configuration
-
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
 	api_key: process.env.CLOUDINARY_API_KEY,

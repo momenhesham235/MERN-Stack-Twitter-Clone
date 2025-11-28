@@ -1,4 +1,4 @@
-import STATUS from "./httpStatusText.js";
+import STATUS from "../utils/http.status.text.js";
 
 const globalError = (error, req, res, next) => {
   res.status(error.httpStatusCode || 500).send({
