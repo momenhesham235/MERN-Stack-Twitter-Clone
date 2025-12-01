@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* DaisyUI Themes (v4 Style) */
+@theme light {
+  --color-primary: rgb(29, 155, 240);
+  --color-secondary: rgb(24, 24, 24);
+}
+
+@theme dark {
+  --color-primary: rgb(29, 155, 240);
+  --color-secondary: rgb(24, 24, 24);
+
+  --color-base-100: #000;
+  --color-base-200: #111;
+  --color-base-300: #222;
+  --color-content: #fff;
+}
