@@ -1,18 +1,48 @@
 @import "tailwindcss";
-@plugin "daisyui";
-
-/* DaisyUI Themes (v4 Style) */
-@theme light {
-  --color-primary: rgb(29, 155, 240);
-  --color-secondary: rgb(24, 24, 24);
+@plugin "daisyui" {
+  themes: light --default, black --prefersdark;
 }
 
-@theme dark {
+/* Custom Black Theme */
+@plugin "daisyui/theme" {
+  name: "black";
+
   --color-primary: rgb(29, 155, 240);
   --color-secondary: rgb(24, 24, 24);
 
   --color-base-100: #000;
-  --color-base-200: #111;
-  --color-base-300: #222;
-  --color-content: #fff;
+  --color-base-200: #0a0a0a;
+  --color-base-300: #111;
+
+  --color-content: #e7e9ea;
+}
+
+/* Dark skeleton with smooth shimmer for black theme */
+[data-theme="black"] .skeleton {
+  background-color: #222 !important; /* خلفية داكنة */
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="black"] .skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skeleton-shine 1.5s infinite;
+}
+
+/* shimmer animation */
+@keyframes skeleton-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
