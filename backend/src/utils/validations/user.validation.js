@@ -1,11 +1,10 @@
 import joi from "joi";
 
-
 const validateRegisterUser = (obj) => {
   const schema = joi.object({
+    email: joi.string().trim().email().required(),
     username: joi.string().trim().min(3).max(30).required(),
     fullname: joi.string().trim().min(3).max(50).required(),
-    email: joi.string().trim().email().required(),
     password: joi.string().trim().min(8).required(),
   });
 
@@ -14,26 +13,18 @@ const validateRegisterUser = (obj) => {
 
 const validateLoginUser = (obj) => {
   const schema = joi.object({
-    identifier: joi.string()  
-      .trim()
-      .required()
-      .messages({
-        "any.required": "Username or Email is required",
-        "string.empty": "Username or Email cannot be empty",
-      }),
-    password: joi.string()
-      .trim()
-      .min(8)
-      .required()
-      .messages({
-        "any.required": "Password is required",
-        "string.min": "Password must be at least 8 characters",
-      }),
+    identifier: joi.string().trim().required().messages({
+      "any.required": "Username or Email is required",
+      "string.empty": "Username or Email cannot be empty",
+    }),
+    password: joi.string().trim().min(8).required().messages({
+      "any.required": "Password is required",
+      "string.min": "Password must be at least 8 characters",
+    }),
   });
 
-  return schema.validate(obj); // return all errors
+  return schema.validate(obj);
 };
-
 
 // validate Update User
 const validateUpdateUser = (obj) => {
@@ -44,11 +35,11 @@ const validateUpdateUser = (obj) => {
     currentPassword: joi.string().trim().min(8).messages({
       "string.min": "Current password must be at least 8 characters",
     }),
-    newPassword: joi.string().trim().min(8).messages({ 
-       "string.min": "New password must be at least 8 characters" 
-      }),
-    bio: joi.string().trim().max(160).allow(''),
-    link: joi.string().uri().trim().allow(''),
+    newPassword: joi.string().trim().min(8).messages({
+      "string.min": "New password must be at least 8 characters",
+    }),
+    bio: joi.string().trim().max(160).allow(""),
+    link: joi.string().uri().trim().allow(""),
   });
 
   return schema.validate(obj);

@@ -15,10 +15,11 @@ import generateTokenAndSetCookie from "../utils/generate.token.js";
  * @access   Public
  ------------------------------------*/
 export const signup = asyncHandler(async (req, res) => {
-  const { username, fullname, email, password } = req.body;
+  const { email, username, fullname, password } = req.body;
 
   // Validate user input
   const { error } = validateRegisterUser(req.body);
+
   if (error) {
     return res
       .status(400)
@@ -85,14 +86,15 @@ export const signup = asyncHandler(async (req, res) => {
  * @access   Public
  ------------------------------------*/
 export const login = asyncHandler(async (req, res) => {
+  const { identifier, password } = req.body; // identifier = username or email
+
   const { error } = validateLoginUser(req.body);
+
   if (error) {
     return res
       .status(400)
       .json({ status: STATUS.FAIL, message: error.details[0].message });
   }
-
-  const { identifier, password } = req.body; // identifier = username or email
 
   if (!identifier || !password) {
     return res.status(400).json({ message: "Please provide both fields" });
@@ -107,9 +109,11 @@ export const login = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Invalid username or email" });
   }
 
+  console.log(user);
+
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Password is incorrect" });
   }
 
   // Generate token and set cookie
@@ -154,5 +158,6 @@ export const getMe = asyncHandler(async (req, res) => {
       .status(404)
       .json({ status: STATUS.FAIL, message: "User not found" });
   }
+
   res.status(200).json({ status: STATUS.SUCCESS, data: user });
 });

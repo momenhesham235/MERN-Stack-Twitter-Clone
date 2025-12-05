@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useLogin from "../../../hooks/auth/useLogin.js";
 
 import XSvg from "../../../components/svgs/X";
 
@@ -8,23 +9,23 @@ import { MdPassword } from "react-icons/md";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    identifier: "",
     password: "",
   });
 
+  const { mutate, isError, isPending, error } = useLogin();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData);
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isError = false;
-
   return (
-    <div className="max-w-screen-xl mx-auto flex h-screen">
+    <div className="max-w-screen-7xl mx-auto flex h-screen">
       <div className="flex-1 hidden lg:flex items-center  justify-center">
         <XSvg className="lg:w-2/3 fill-white" />
       </div>
@@ -38,9 +39,9 @@ const LoginPage = () => {
               type="text"
               className="grow"
               placeholder="username"
-              name="username"
+              name="identifier"
               onChange={handleInputChange}
-              value={formData.username}
+              value={formData.identifier}
             />
           </label>
 
@@ -56,9 +57,11 @@ const LoginPage = () => {
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">
-            Login
+            {isPending ? "Loading..." : "Login"}
           </button>
-          {isError && <p className="text-red-500">Something went wrong</p>}
+          {isError && (
+            <p className="text-red-500">{error.response.data.message}</p>
+          )}
         </form>
         <div className="flex flex-col gap-2 mt-4">
           <p className="text-white text-lg">{"Don't"} have an account?</p>

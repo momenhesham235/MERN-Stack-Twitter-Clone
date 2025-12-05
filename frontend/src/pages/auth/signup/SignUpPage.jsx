@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-
+import useSignup from "../../../hooks/auth/useSignup.js";
 import XSvg from "../../../components/svgs/X.jsx";
 
 import { MdOutlineMail } from "react-icons/md";
@@ -12,20 +12,20 @@ const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
-    fullName: "",
+    fullname: "",
     password: "",
   });
 
+  const { mutate, isError, isPending, error } = useSignup();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData);
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const isError = false;
 
   return (
     <div className="max-w-screen-7xl mx-auto flex h-screen px-10">
@@ -46,6 +46,8 @@ const SignUpPage = () => {
           <label className="input input-bordered rounded flex items-center gap-2">
             <MdOutlineMail />
             <input
+              required
+              autoComplete="email"
               type="email"
               className="grow"
               placeholder="Email"
@@ -58,6 +60,8 @@ const SignUpPage = () => {
             <label className="input input-bordered rounded flex items-center gap-2 flex-1">
               <FaUser />
               <input
+                required
+                autoComplete="username"
                 type="text"
                 className="grow "
                 placeholder="Username"
@@ -69,18 +73,22 @@ const SignUpPage = () => {
             <label className="input input-bordered rounded flex items-center gap-2 flex-1">
               <MdDriveFileRenameOutline />
               <input
+                required
+                autoComplete="name"
                 type="text"
                 className="grow"
                 placeholder="Full Name"
-                name="fullName"
+                name="fullname"
                 onChange={handleInputChange}
-                value={formData.fullName}
+                value={formData.fullname}
               />
             </label>
           </div>
           <label className="input input-bordered rounded flex items-center gap-2">
             <MdPassword />
             <input
+              required
+              autoComplete="current-password"
               type="password"
               className="grow"
               placeholder="Password"
@@ -90,9 +98,13 @@ const SignUpPage = () => {
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">
-            Sign up
+            {isPending ? "Signing up..." : "Sign up"}
           </button>
-          {isError && <p className="text-red-500">Something went wrong</p>}
+          {isError && (
+            <p className="text-red-500">
+              {error.response.data.message || "Something went wrong"}
+            </p>
+          )}
         </form>
 
         {/* FOOTER */}

@@ -23,38 +23,45 @@ import "./src/config/database.js";
 // Create express app
 const app = express();
 
+// CORS for prevent cross-origin attack
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true, // Cookies
+  })
+);
+
 // Middlewares
-app.use(express.json()); // For parsing application/json
+app.use(express.json({ limit: "20kb" })); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 app.use(cookieParser()); // For parsing cookies in requests
 app.use(morganMiddleware); // For logging
 
-// Security Middleware
-app.use(helmet()); // Set security HTTP headers
-app.use(mongoSanitize()); // Prevent NoSQL injection
-app.use(hpp());
-app.use(xss());
-// CORS for prevent cross-origin attack
-app.use(cors());
-// app.options(cors());
-app.use(compression()); // Compress responses for better performance
+// // Security Middleware
+// app.use(helmet()); // Set security HTTP headers
+// app.use(mongoSanitize()); // Prevent NoSQL injection
+// app.use(hpp());
+// app.use(xss());
 
-// Rate limiter
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 100, // 100 request لكل IP
-  message: "Too many requests from this IP, please try again after 15 minutes",
-});
-app.use(limiter);
+// app.use(compression()); // Compress responses for better performance
 
-// Slow down
-const speedLimiter = slowDown({
-  windowMs: 15 * 60 * 1000,
-  delayAfter: 50,
-  delayMs: () => 500,
-});
+// // Rate limiter
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 دقيقة
+//   max: 100, // 100 request لكل IP
+//   message: "Too many requests from this IP, please try again after 15 minutes",
+// });
+// app.use(limiter);
 
-app.use(speedLimiter);
+// // Slow down
+// const speedLimiter = slowDown({
+//   windowMs: 15 * 60 * 1000,
+//   delayAfter: 50,
+//   delayMs: () => 500,
+// });
+
+// app.use(speedLimiter);
 
 // Cloudinary configuration
 cloudinary.config({
