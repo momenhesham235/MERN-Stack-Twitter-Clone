@@ -2,15 +2,13 @@ import { CiImageOn } from "react-icons/ci";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
+import useCreatePost from "../../hooks/posts/useCreatePost";
 
 const CreatePost = () => {
-  const [text, setText] = useState("");
-  const [img, setImg] = useState(null);
-
+  const { mutate: createPost, isPending, isError, error } = useCreatePost();
+  const [content, setText] = useState("");
+  const [img, setImg] = useState("");
   const imgRef = useRef(null);
-
-  const isPending = false;
-  const isError = false;
 
   const data = {
     profileImg: "/src/assets/images/avatars/girl1.png",
@@ -18,7 +16,14 @@ const CreatePost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Post created successfully");
+    const postData = { content, img };
+    createPost(postData, {
+      onSuccess: () => {
+        setText("");
+        setImg("");
+        if (imgRef.current) imgRef.current.value = null;
+      },
+    });
   };
 
   const handleImgChange = (e) => {
@@ -43,7 +48,7 @@ const CreatePost = () => {
         <textarea
           className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800"
           placeholder="What is happening?!"
-          value={text}
+          value={content}
           onChange={(e) => setText(e.target.value)}
         />
         {img && (
@@ -81,7 +86,11 @@ const CreatePost = () => {
             {isPending ? "Posting..." : "Post"}
           </button>
         </div>
-        {isError && <div className="text-red-500">Something went wrong</div>}
+        {isError && (
+          <div className="text-red-500">
+            {error?.response?.data?.message || error.message}
+          </div>
+        )}
       </form>
     </div>
   );

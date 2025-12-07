@@ -20,6 +20,8 @@ export const getUserPosts = async (username) => {
 
 // CREATE post
 export const createPost = async (postData) => {
+  console.log(postData);
+
   const res = await api.post("/posts/create", postData);
   return res.data;
 };
@@ -30,12 +32,8 @@ export const deletePost = async (postId) => {
   return res.data;
 };
 
-
 // LIKE or UNLIKE post
 export const likePost = async (postId) => {
   const res = await api.post(`/posts/like/${postId}`);
   return res.data;
 };
-
-
-

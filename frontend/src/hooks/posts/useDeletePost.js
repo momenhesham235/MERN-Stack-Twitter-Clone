@@ -15,7 +15,7 @@ export const useDeletePost = () => {
 
       // هات النسخة القديمة
       const previousPosts = queryClient.getQueryData(["posts"]);
-
+      
       // اعمل Optimistic Update → امسح البوست من UI
       queryClient.setQueryData(["posts"], (oldPosts = []) =>
         oldPosts.filter((post) => post._id !== postId)

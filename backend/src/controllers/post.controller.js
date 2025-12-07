@@ -83,16 +83,18 @@ export const getSinglePost = asyncHandler(async (req, res) => {
  * @access Protected
  */
 export const createPost = asyncHandler(async (req, res) => {
+  // get user form req.user
+  const { content } = req.body;
+  let { img } = req.body;
+
   const { error } = validateCreatePost(req.body);
+
   if (error) {
     return res
       .status(400)
       .json({ status: STATUS.FAILURE, message: error.details[0].message });
   }
 
-  // get user form req.user
-  const { content } = req.body;
-  let { img } = req.body;
   const userId = req.user._id.toString();
 
   const user = await User.findById(userId);
