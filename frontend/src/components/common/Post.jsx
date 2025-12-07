@@ -7,16 +7,18 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useGetMe from "../../hooks/auth/useGetMe";
 import { formatPostDate } from "../../utils/date";
+import { useDeletePost } from "../../hooks/posts/useDeletePost";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Post = ({ post = {} }) => {
   const { data: authUser } = useGetMe();
-  // console.log(authUser.data);
-  
-  const isMyPost = authUser._id === post.user._id;
+  const { mutate: deletePostMutate, isPending: isDeleting } = useDeletePost();
+
+  const isMyPost = authUser.data._id === post.user._id;
 
   const isLiked = post.likes.includes(authUser.data._id);
 
-  	const postOwner = post.user;
+  const postOwner = post.user;
 
   const formattedDate = formatPostDate(post.createdAt);
 
@@ -24,7 +26,11 @@ const Post = ({ post = {} }) => {
 
   const isCommenting = false;
 
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      deletePostMutate(post._id);
+    }
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -40,7 +46,11 @@ const Post = ({ post = {} }) => {
             to={`/profile/${postOwner.username}`}
             className="w-8 rounded-full overflow-hidden"
           >
-            <img src={postOwner.profileImg || "src/assets/images/avatars/girl1.png"} />
+            <img
+              src={
+                postOwner.profileImg || "src/assets/images/avatars/girl1.png"
+              }
+            />
           </Link>
         </div>
         <div className="flex flex-col flex-1">
@@ -57,10 +67,14 @@ const Post = ({ post = {} }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash
-                  className="cursor-pointer hover:text-red-500"
-                  onClick={handleDeletePost}
-                />
+                {!isDeleting && (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
+
+                {isDeleting && <LoadingSpinner size="sm" />}
               </span>
             )}
           </div>
