@@ -5,15 +5,22 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useGetMe from "../../hooks/auth/useGetMe";
+import { formatPostDate } from "../../utils/date";
 
-const Post = ({ post }) => {
+const Post = ({ post = {} }) => {
+  const { data: authUser } = useGetMe();
+  // console.log(authUser.data);
+  
+  const isMyPost = authUser._id === post.user._id;
+
+  const isLiked = post.likes.includes(authUser.data._id);
+
+  	const postOwner = post.user;
+
+  const formattedDate = formatPostDate(post.createdAt);
+
   const [comment, setComment] = useState("");
-  const postOwner = post.user;
-  const isLiked = false;
-
-  const isMyPost = true;
-
-  const formattedDate = "1h";
 
   const isCommenting = false;
 
@@ -33,7 +40,7 @@ const Post = ({ post }) => {
             to={`/profile/${postOwner.username}`}
             className="w-8 rounded-full overflow-hidden"
           >
-            <img src={postOwner.profileImg || "/avatar-placeholder.png"} />
+            <img src={postOwner.profileImg || "src/assets/images/avatars/girl1.png"} />
           </Link>
         </div>
         <div className="flex flex-col flex-1">
@@ -58,7 +65,7 @@ const Post = ({ post }) => {
             )}
           </div>
           <div className="flex flex-col gap-3 overflow-hidden">
-            <span>{post.text}</span>
+            <span>{post.content}</span>
             {post.img && (
               <img
                 src={post.img}

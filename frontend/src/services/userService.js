@@ -2,7 +2,7 @@ import api from "./api.js";
 
 /**
  * @desc signup user
- * @param {*} userData
+ * @param  userData
  * @returns response data
  */
 export const signupUser = async (userData) => {
@@ -12,7 +12,7 @@ export const signupUser = async (userData) => {
 
 /**
  * @desc login user
- * @param {*} credentials
+ * @param  credentials
  * @returns response data
  * */
 export const loginUser = async (credentials) => {
@@ -29,6 +29,10 @@ export const logoutUser = async () => {
   return res.data;
 };
 
+/**
+ * @desc get current user
+ * @returns response data
+ * */
 export const getMe = async () => {
   const res = await api.get("/auth/me");
   return res.data;

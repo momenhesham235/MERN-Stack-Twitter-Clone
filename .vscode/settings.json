@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["maxlength", "MERN", "postid", "svgs", "virtuals"]
+  "cSpell.words": ["maxlength", "MERN", "postid", "Repost", "svgs", "virtuals"],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

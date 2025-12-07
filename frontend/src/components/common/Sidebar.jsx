@@ -10,14 +10,13 @@ import useGetMe from "../../hooks/auth/useGetMe.js";
 
 const Sidebar = () => {
   const { mutate } = useLogout();
+
   const { data: authUser } = useGetMe();
 
   const handleLogout = (e) => {
     e.preventDefault();
     mutate();
   };
-
-  console.log(authUser);
 
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
