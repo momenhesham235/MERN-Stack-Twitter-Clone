@@ -3,16 +3,15 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import useCreatePost from "../../hooks/posts/useCreatePost";
+import useGetMe from "../../hooks/auth/useGetMe";
 
 const CreatePost = () => {
+  const { data: authUser } = useGetMe();
+
   const { mutate: createPost, isPending, isError, error } = useCreatePost();
   const [content, setText] = useState("");
   const [img, setImg] = useState("");
   const imgRef = useRef(null);
-
-  const data = {
-    profileImg: "/src/assets/images/avatars/girl1.png",
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,7 +40,12 @@ const CreatePost = () => {
     <div className="flex p-4 items-start gap-4 border-b border-gray-700">
       <div className="avatar">
         <div className="w-8 rounded-full">
-          <img src={data.profileImg || "/avatar-placeholder.png"} />
+          <img
+            src={
+              authUser.data.profileImg ||
+              "src/assets/images/avatar-placeholder.png"
+            }
+          />
         </div>
       </div>
       <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>

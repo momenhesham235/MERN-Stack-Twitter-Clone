@@ -6,7 +6,7 @@ export const POSTS = [
     user: {
       username: "johndoe",
       profileImg: "src/assets/images/avatars/boy1.png",
-      fullName: "John Doe",
+      fullname: "John Doe",
     },
     comments: [
       {
@@ -15,7 +15,7 @@ export const POSTS = [
         user: {
           username: "janedoe",
           profileImg: "src/assets/images/avatars/girl1.png",
-          fullName: "Jane Doe",
+          fullname: "Jane Doe",
         },
       },
     ],
@@ -27,7 +27,7 @@ export const POSTS = [
     user: {
       username: "johndoe",
       profileImg: "src/assets/images/avatars/boy2.png",
-      fullName: "John Doe",
+      fullname: "John Doe",
     },
     comments: [
       {
@@ -36,7 +36,7 @@ export const POSTS = [
         user: {
           username: "janedoe",
           profileImg: "src/assets/images/avatars/girl1.png",
-          fullName: "Jane Doe",
+          fullname: "Jane Doe",
         },
       },
     ],
@@ -49,7 +49,7 @@ export const POSTS = [
     user: {
       username: "johndoe",
       profileImg: "src/assets/images/avatars/boy3.png",
-      fullName: "John Doe",
+      fullname: "John Doe",
     },
     comments: [],
     likes: [
@@ -68,7 +68,7 @@ export const POSTS = [
     user: {
       username: "johndoe",
       profileImg: "src/assets/images/avatars/boy3.png",
-      fullName: "John Doe",
+      fullname: "John Doe",
     },
     comments: [
       {
@@ -77,7 +77,7 @@ export const POSTS = [
         user: {
           username: "janedoe",
           profileImg: "src/assets/images/avatars/girl1.png",
-          fullName: "Jane Doe",
+          fullname: "Jane Doe",
         },
       },
     ],
@@ -98,25 +98,25 @@ export const POSTS = [
 export const USERS_FOR_RIGHT_PANEL = [
   {
     _id: "1",
-    fullName: "John Doe",
+    fullname: "John Doe",
     username: "johndoe",
     profileImg: "src/assets/images/avatars/boy1.png",
   },
   {
     _id: "2",
-    fullName: "Jane Doe",
+    fullname: "Jane Doe",
     username: "janedoe",
     profileImg: "src/assets/images/avatars/girl1.png",
   },
   {
     _id: "3",
-    fullName: "Bob Doe",
+    fullname: "Bob Doe",
     username: "bobdoe",
     profileImg: "/src/assets/images/avatars/boy2.png",
   },
   {
     _id: "4",
-    fullName: "Daisy Doe",
+    fullname: "Daisy Doe",
     username: "daisydoe",
     profileImg: "/src/assets/images/avatars/girl2.png",
   },

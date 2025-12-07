@@ -37,3 +37,12 @@ export const getMe = async () => {
   const res = await api.get("/auth/me");
   return res.data;
 };
+
+/**
+ * @desc get suggested users
+ * @returns response data
+ * */
+export const getSuggestedUsers = async () => {
+  const res = await api.get("/users/suggested");
+  return res.data.data;
+};

@@ -48,7 +48,8 @@ const Post = ({ post = {} }) => {
           >
             <img
               src={
-                postOwner.profileImg || "src/assets/images/avatars/girl1.png"
+                postOwner.profileImg ||
+                "src/assets/images/avatar-placeholder.png"
               }
             />
           </Link>
@@ -56,7 +57,7 @@ const Post = ({ post = {} }) => {
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
             <Link to={`/profile/${postOwner.username}`} className="font-bold">
-              {postOwner.fullName}
+              {postOwner.fullname}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
               <Link to={`/profile/${postOwner.username}`}>
@@ -123,7 +124,7 @@ const Post = ({ post = {} }) => {
                             <img
                               src={
                                 comment.user.profileImg ||
-                                "/avatar-placeholder.png"
+                                "src/assets/images/avatar-placeholder.png"
                               }
                             />
                           </div>
@@ -131,7 +132,7 @@ const Post = ({ post = {} }) => {
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1">
                             <span className="font-bold">
-                              {comment.user.fullName}
+                              {comment.user.fullname}
                             </span>
                             <span className="text-gray-700 text-sm">
                               @{comment.user.username}
