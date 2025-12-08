@@ -5,6 +5,7 @@ const useGetMe = () => {
   return useQuery({
     queryKey: ["authUser"], // Unique key for the query
     queryFn: () => getMe(), // Function to fetch data from the API
+    staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false,
   });
 };

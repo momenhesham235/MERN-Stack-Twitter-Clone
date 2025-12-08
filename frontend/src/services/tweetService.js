@@ -1,20 +1,14 @@
 import api from "./api.js";
 
-// GET all posts (all, following)
-export const getPosts = async (type = "all") => {
-  const res = await api.get(`/posts/${type}`);
-  return res.data;
+// GET all posts (all, following , your posts , your liked posts)
+export const getPosts = async (type = "posts/all") => {
+  const { data } = await api.get(`/${type}`);
+  return data.data;
 };
 
 // GET following posts
 export const getFollowingPosts = async () => {
   const res = await api.get("/posts/following");
-  return res.data;
-};
-
-// GET posts by username
-export const getUserPosts = async (username) => {
-  const res = await api.get(`/posts/user/${username}`);
   return res.data;
 };
 

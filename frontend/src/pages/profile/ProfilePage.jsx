@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -11,30 +11,28 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import useGetProfile from "../../hooks/users/useGetProfile";
+import useGetMe from "../../hooks/auth/useGetMe";
+import { set } from "mongoose";
+// import { formatMemberSinceDate } from "../../utils/date";
 
 const ProfilePage = () => {
-  const [coverImg, setCoverImg] = useState(null);
-  const [profileImg, setProfileImg] = useState(null);
-  const [feedType, setFeedType] = useState("posts");
+  const { username } = useParams();
+
+  const [coverImg, setCoverImg] = useState("");
+  const [profileImg, setProfileImg] = useState("");
+  const [feedType, setFeedType] = useState(`posts/user/${username}`);
 
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
 
-  const isLoading = false;
-  const isMyProfile = true;
+  const { data: authUser } = useGetMe();
+  const { data: user, isLoading, isRefetching } = useGetProfile(username);
 
-  const user = {
-    _id: "1",
-    fullName: "John Doe",
-    username: "johndoe",
-    profileImg: "/src/assets/images/avatars/boy1.png",
-    coverImg: "/src/assets/images/posts/post2.png",
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    link: "https://youtube.com/@asaprogrammer_",
-    following: ["1", "2", "3"],
-    followers: ["1", "2", "3"],
-  };
+  const isMyProfile = authUser?.data._id === user?._id;
 
+  // const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+  // const amIFollowing = authUser?.following.includes(user?._id);
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
     if (file) {
@@ -47,16 +45,22 @@ const ProfilePage = () => {
     }
   };
 
+  useEffect(() => {
+    setFeedType(`posts/user/${username}`);
+  }, [username, feedType]);
+
+  console.log(feedType);
+
   return (
     <>
       <div className="flex-[4_4_0]  border-r border-gray-700 min-h-screen ">
         {/* HEADER */}
-        {isLoading && <ProfileHeaderSkeleton />}
-        {!isLoading && !user && (
+        {isLoading || (isRefetching && <ProfileHeaderSkeleton />)}
+        {!isLoading && !isRefetching && !user && (
           <p className="text-center text-lg mt-4">User not found</p>
         )}
         <div className="flex flex-col">
-          {!isLoading && user && (
+          {!isLoading && !isRefetching && user && (
             <>
               <div className="flex gap-10 px-4 py-2 items-center">
                 <Link to="/">
@@ -86,14 +90,12 @@ const ProfilePage = () => {
                 )}
 
                 <input
-                  accept="image/*"
                   type="file"
                   hidden
                   ref={coverImgRef}
                   onChange={(e) => handleImgChange(e, "coverImg")}
                 />
                 <input
-                  accept="image/*"
                   type="file"
                   hidden
                   ref={profileImgRef}
@@ -190,19 +192,19 @@ const ProfilePage = () => {
               <div className="flex w-full border-b border-gray-700 mt-4">
                 <div
                   className="flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer"
-                  onClick={() => setFeedType("posts")}
+                  onClick={() => setFeedType(`posts/user/${username}`)}
                 >
                   Posts
-                  {feedType === "posts" && (
+                  {feedType === `posts/user/${username}` && (
                     <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary" />
                   )}
                 </div>
                 <div
                   className="flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer"
-                  onClick={() => setFeedType("likes")}
+                  onClick={() => setFeedType(`likes/${user?._id}`)}
                 >
                   Likes
-                  {feedType === "likes" && (
+                  {feedType === `likes/${user?._id}` && (
                     <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary" />
                   )}
                 </div>
@@ -210,7 +212,7 @@ const ProfilePage = () => {
             </>
           )}
 
-          <Posts feedType={feedType} />
+          <Posts feedType={feedType} username={username} />
         </div>
       </div>
     </>

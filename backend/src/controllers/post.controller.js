@@ -297,6 +297,7 @@ export const getUserPosts = asyncHandler(async (req, res) => {
   const { username } = req.params;
 
   const user = await User.findOne({ username });
+
   if (!user) return res.status(404).json({ error: "User not found" });
 
   const posts = await Post.find({ user: user._id })
@@ -310,5 +311,7 @@ export const getUserPosts = asyncHandler(async (req, res) => {
       populate: { path: "userid", select: "username fullname profileImg" },
     });
 
-  res.status(200).json(posts);
+  console.log(posts);
+
+  res.status(200).json({ status: STATUS.SUCCESS, data: posts });
 });

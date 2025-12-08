@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getPosts } from "../../services/tweetService.js";
 
-export const useGetPosts = (type = "all") => {
+export const useGetPosts = (type = "posts/all") => {
   return useQuery({
     queryKey: ["posts", type],
     queryFn: () => getPosts(type),

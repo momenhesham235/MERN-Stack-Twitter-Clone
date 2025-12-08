@@ -46,3 +46,13 @@ export const getSuggestedUsers = async () => {
   const res = await api.get("/users/suggested");
   return res.data.data;
 };
+
+/**
+ * @desc get user profile
+ * @param  username
+ * @returns response data
+ * */
+export const getUserProfile = async (username) => {
+  const { data } = await api.get(`users/profile/${username}`);
+  return data.data;
+};

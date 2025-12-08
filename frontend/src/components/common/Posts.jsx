@@ -1,12 +1,19 @@
 import Post from "./Post";
 import PostSkeleton from "../skeletons/PostSkeleton";
 import { useGetPosts } from "../../hooks/posts/useGetPosts.js";
+import { useEffect } from "react";
 
-const Posts = ({ feedType }) => {
+const Posts = ({ feedType, username }) => {
+  const {
+    data: POSTS,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useGetPosts(feedType);
 
-  const { data: posts = [], isLoading, isRefetching } = useGetPosts(feedType);
-
-  const { data: POSTS } = posts;
+  useEffect(() => {
+    refetch();
+  }, [feedType, username, refetch]);
 
   return (
     <>

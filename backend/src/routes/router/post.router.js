@@ -15,12 +15,11 @@ import validationObjectID from "../../middlewares/validationObjectID.js";
 
 const postRoutes = Router();
 
-// Define your post-related routes here
 postRoutes.get("/all", protectRoute, getAllPosts);
 postRoutes.get("/following", protectRoute, getFollowingPosts);
 postRoutes.get("/count", protectRoute, getPostCount);
 postRoutes.get("/user/:username", protectRoute, getUserPosts);
-postRoutes.get("/liked/:id", protectRoute, validationObjectID, getLikedPosts);
+postRoutes.get("/likes/:id", protectRoute, validationObjectID, getLikedPosts);
 
 postRoutes.post("/create", protectRoute, createPost);
 postRoutes.post(
