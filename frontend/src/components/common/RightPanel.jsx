@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton.jsx";
-import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy.js";
 import { useSuggestedUsers } from "../../hooks/users/useSuggestedUsers.js";
+import useFollowOrUnfollowUser from "../../hooks/users/useFollowOrUnfollowUser";
 
 const RightPanel = () => {
   const { data: suggestedUsers, isLoading } = useSuggestedUsers();
+  const { mutate: toggleFollow, isPending } = useFollowOrUnfollowUser();
 
   if (suggestedUsers?.length === 0) return <div className="md:w-64 w-0"></div>;
 
@@ -52,9 +53,16 @@ const RightPanel = () => {
                 <div>
                   <button
                     className="btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleFollow(user._id);
+                    }}
                   >
-                    Follow
+                    {isPending ? (
+                      <span className="loading loading-spinner"></span>
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 </div>
               </Link>

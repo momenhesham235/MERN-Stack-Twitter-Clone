@@ -56,3 +56,13 @@ export const getUserProfile = async (username) => {
   const { data } = await api.get(`users/profile/${username}`);
   return data.data;
 };
+
+/**
+ * @desc follow or unfollow user
+ * @param  user id
+ * @returns response data
+ * */
+export const followOrUnfollowUser = async (id) => {
+  const res = await api.post(`/users/follow/${id}`);
+  return res.data;
+};

@@ -11,9 +11,9 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import useGetProfile from "../../hooks/users/useGetProfile";
 import useGetMe from "../../hooks/auth/useGetMe";
-import { set } from "mongoose";
+import useGetProfile from "../../hooks/users/useGetProfile";
+import useFollowOrUnfollowUser from "../../hooks/users/useFollowOrUnfollowUser";
 // import { formatMemberSinceDate } from "../../utils/date";
 
 const ProfilePage = () => {
@@ -28,11 +28,12 @@ const ProfilePage = () => {
 
   const { data: authUser } = useGetMe();
   const { data: user, isLoading, isRefetching } = useGetProfile(username);
+  const { mutate: toggleFollow, isPending } = useFollowOrUnfollowUser();
 
   const isMyProfile = authUser?.data._id === user?._id;
 
   // const memberSinceDate = formatMemberSinceDate(user?.createdAt);
-  // const amIFollowing = authUser?.following.includes(user?._id);
+  const amIFollowing = authUser?.data?.following.includes(user?._id);
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
     if (file) {
@@ -49,7 +50,6 @@ const ProfilePage = () => {
     setFeedType(`posts/user/${username}`);
   }, [username, feedType]);
 
-  console.log(feedType);
 
   return (
     <>
@@ -127,9 +127,15 @@ const ProfilePage = () => {
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
-                    onClick={() => alert("Followed successfully")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleFollow(user._id);
+                    }}
+                    disabled={isPending}
                   >
-                    Follow
+                    {isPending && "Loading..."}
+                    {!isPending && amIFollowing && "Unfollow"}
+                    {!isPending && !amIFollowing && "Follow"}
                   </button>
                 )}
                 {(coverImg || profileImg) && (

@@ -64,7 +64,8 @@ export const followOrUnfollowUser = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       status: STATUS.SUCCESS,
-      message: "User unfollowed successfully",
+      message: `${currentUser.username}  unfollowing you.`,
+      code: "unfollowed",
     });
   } else {
     // Follow user
@@ -91,18 +92,12 @@ export const followOrUnfollowUser = asyncHandler(async (req, res) => {
     res.status(200).json({
       status: STATUS.SUCCESS,
       message: `${currentUser.username} started following you.`,
+      code: "followed",
     });
   }
 
   await currentUser.save();
   await userToModify.save();
-
-  res.status(200).json({
-    status: STATUS.SUCCESS,
-    message: isFollowing
-      ? "User unfollowed successfully"
-      : "User followed successfully",
-  });
 });
 
 /**---------------------------------------
