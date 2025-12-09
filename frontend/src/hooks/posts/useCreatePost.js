@@ -11,23 +11,37 @@ const useCreatePost = () => {
 
     // ---- Optimistic Update ----
     onMutate: async (newPost) => {
-      await queryClient.cancelQueries({ queryKey: ["posts", "all"] });
+      // 1️⃣ Cancel old queries
+      await queryClient.cancelQueries(["posts", "posts/all"]);
 
-      const previousPosts = queryClient.getQueryData(["posts", "all"]);
+      // 2️⃣ Get previous posts (rollback)
+      const previousPosts = queryClient.getQueryData(["posts", "posts/all"]);
 
-      queryClient.setQueryData(["posts", "all"], (old) => {
+      // 3️⃣ Get logged-in user
+      const authUser = queryClient.getQueryData(["authUser"])?.data;
+
+      // 4️⃣ Optimistic UI update
+      queryClient.setQueryData(["posts", "posts/all"], (old) => {
         if (!old) return old;
 
         return {
           ...old,
-          userPosts: [
+          data: [
             {
               ...newPost,
               _id: Math.random().toString(36).substring(2, 9),
               createdAt: new Date().toISOString(),
               isOptimistic: true,
+              likes: [],
+              comments: [],
+              // User object MUST MATCH real backend shape
+              user: {
+                _id: authUser?._id,
+                username: authUser?.username,
+                profileImg: authUser?.profileImg,
+              },
             },
-            ...(old.userPosts || []),
+            ...(old.data || []),
           ],
         };
       });
@@ -35,15 +49,17 @@ const useCreatePost = () => {
       return { previousPosts };
     },
 
+    // ---- Rollback if error ----
     onError: (_err, _newPost, context) => {
-      queryClient.setQueryData(["posts", "all"], context.previousPosts);
-      toast.error(`${_err.response.data.message}`);
+      queryClient.setQueryData(["posts", "posts/all"], context.previousPosts);
+      toast.error(_err?.response?.data?.message || "Error creating post");
     },
 
+    // ---- On success (no refetch needed) ----
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts", "all"] });
       toast.success("Post created");
-    }
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
   });
 };
 

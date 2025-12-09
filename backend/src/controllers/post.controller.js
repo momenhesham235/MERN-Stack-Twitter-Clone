@@ -175,51 +175,51 @@ export const likeOrUnlikePost = asyncHandler(async (req, res) => {
   const { id: postId } = req.params;
 
   const post = await Post.findById(postId);
+
   if (!post) {
-    return res
-      .status(404)
-      .json({ status: STATUS.FAILURE, message: "Post not found" });
+    return res.status(404).json({ error: "Post not found" });
   }
+
+  const userLikedPost = post.likes.includes(userId);
 
   let updatedPost;
 
-  if (post.likes.includes(userId)) {
-    // Unlike post
+  if (userLikedPost) {
+    // 🔄 Unlike
     updatedPost = await Post.findByIdAndUpdate(
       postId,
       { $pull: { likes: userId } },
-      { new: true }
+      { new: true } // ← يرجع النسخة بعد التحديث
     );
-    await User.findByIdAndUpdate(userId, { $pull: { likedPosts: postId } });
 
-    res.status(200).json({
-      status: STATUS.SUCCESS,
-      message: "Post unlike successfully",
-      data: updatedPost.likes,
-    });
+    await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
   } else {
-    // Like post
+    // ❤️ Like
     updatedPost = await Post.findByIdAndUpdate(
       postId,
-      { $addToSet: { likes: userId } }, //
+      { $addToSet: { likes: userId } }, // ← يمنع الازدواج لو حصل سباق
       { new: true }
     );
 
-    await User.findByIdAndUpdate(userId, { $addToSet: { likedPosts: postId } });
+    await User.updateOne(
+      { _id: userId },
+      { $addToSet: { likedPosts: postId } }
+    );
 
-    const notification = new Notification({
+    // إرسال إشعار
+    await Notification.create({
       from: userId,
       to: post.user,
       type: "like",
     });
-    await notification.save();
-
-    res.status(200).json({
-      status: STATUS.SUCCESS,
-      message: "Post liked successfully",
-      data: updatedPost.likes,
-    });
   }
+
+  // 🔥 رجّع النسخة المحدثة من likes فقط
+  return res.status(200).json({
+    status: STATUS.SUCCESS,
+    likes: updatedPost.likes,
+    likesCount: updatedPost.likes.length,
+  });
 });
 
 /**
@@ -241,6 +241,7 @@ export const getPostCount = asyncHandler(async (req, res) => {
  */
 export const getLikedPosts = asyncHandler(async (req, res) => {
   const userId = req.params.id;
+
   const user = await User.findById(userId);
   if (!user)
     return res
@@ -256,6 +257,7 @@ export const getLikedPosts = asyncHandler(async (req, res) => {
       path: "comments",
       populate: { path: "userid", select: "username fullname profileImg" },
     });
+  console.log(likedPosts);
 
   res.status(200).json({ status: STATUS.SUCCESS, data: likedPosts });
 });

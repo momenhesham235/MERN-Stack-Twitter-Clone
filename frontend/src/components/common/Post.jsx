@@ -7,36 +7,36 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useGetMe from "../../hooks/auth/useGetMe";
 import { formatPostDate } from "../../utils/date";
-import { useDeletePost } from "../../hooks/posts/useDeletePost";
+import useDeletePost from "../../hooks/posts/useDeletePost";
 import LoadingSpinner from "./LoadingSpinner";
+import useLikeOrUnLikePost from "../../hooks/posts/useLikeOrUnlikePost";
 
 const Post = ({ post = {} }) => {
   const { data: authUser } = useGetMe();
+
   const { mutate: deletePostMutate, isPending: isDeleting } = useDeletePost();
-
-  const isMyPost = authUser.data._id === post.user._id;
-
-  const isLiked = post.likes.includes(authUser.data._id);
-
-  const postOwner = post.user;
-
-  const formattedDate = formatPostDate(post.createdAt);
-
-  const [comment, setComment] = useState("");
-
-  const isCommenting = false;
-
   const handleDeletePost = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       deletePostMutate(post._id);
     }
   };
 
+  const { mutate: likePostMutate, isPending: isLiking } = useLikeOrUnLikePost();
+  const isLiked = post.likes?.includes(authUser?.data?._id);
+  const handleLikePost = () => {
+    if (isLiking) return;
+    likePostMutate(post._id);
+  };
+
+  const isMyPost = authUser?.data?._id === post.user?._id;
+  const formattedDate = formatPostDate(post.createdAt);
+  const postOwner = post.user || {};
+
+  const [comment, setComment] = useState("");
+  const isCommenting = false;
   const handlePostComment = (e) => {
     e.preventDefault();
   };
-
-  const handleLikePost = () => {};
 
   return (
     <>
@@ -176,16 +176,17 @@ const Post = ({ post = {} }) => {
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
-                {!isLiked && (
+                {isLiking && <LoadingSpinner size="sm" />}
+                {!isLiked && !isLiking && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
                 )}
-                {isLiked && (
+                {isLiked && !isLiking && (
                   <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
                 )}
 
                 <span
-                  className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-                    isLiked ? "text-pink-500" : ""
+                  className={`text-sm  group-hover:text-pink-500 ${
+                    isLiked ? "text-pink-500" : "text-slate-500"
                   }`}
                 >
                   {post.likes.length}

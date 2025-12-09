@@ -5,11 +5,13 @@ import { useEffect } from "react";
 
 const Posts = ({ feedType, username }) => {
   const {
-    data: POSTS,
+    data: posts,
     isLoading,
     isRefetching,
     refetch,
   } = useGetPosts(feedType);
+
+  const POSTS = posts?.data;
 
   useEffect(() => {
     refetch();
