@@ -258,7 +258,6 @@ export const getLikedPosts = asyncHandler(async (req, res) => {
       path: "comments",
       populate: { path: "userid", select: "username fullname profileImg" },
     });
-  console.log(likedPosts);
 
   res.status(200).json({ status: STATUS.SUCCESS, data: likedPosts });
 });
@@ -314,7 +313,6 @@ export const getUserPosts = asyncHandler(async (req, res) => {
       populate: { path: "userid", select: "username fullname profileImg" },
     });
 
-  console.log(posts);
 
   res.status(200).json({ status: STATUS.SUCCESS, data: posts });
 });

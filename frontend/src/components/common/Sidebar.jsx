@@ -46,7 +46,7 @@ const Sidebar = () => {
 
               {/* 🔴 Dot for unread notifications */}
               {notifications.some((n) => !n.read) && (
-                <span className="absolute top-2 right-2 w-2 h-2 bg-sky-500 rounded-full"></span>
+                <span className="absolute top-2 left-6 w-2 h-2 bg-sky-500 rounded-full"></span>
               )}
             </Link>
           </li>

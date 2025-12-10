@@ -1,125 +1,63 @@
-// // hooks/posts/useLikeOrUnlikePost.js
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { likeOrUnLikePost } from "../../services/tweetService";
-// import toast from "react-hot-toast";
-
-// const useLikeOrUnlikePost = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: (postId) => likeOrUnLikePost(postId),
-
-//     onMutate: async (postId) => {
-//       await queryClient.cancelQueries({ queryKey: ["posts", "posts/all"] });
-
-//       const previousPosts = queryClient.getQueryData(["posts", "posts/all"]);
-//       const authUser = queryClient.getQueryData(["authUser"]);
-//       const authUserId = authUser?.data?._id;
-
-//       if (!authUserId) return { previousPosts };
-
-//       queryClient.setQueryData(["posts", "posts/all"], (old = {}) => ({
-//         ...old,
-//         data: (old.data || []).map((post) => {
-//           if (post._id !== postId) return post;
-
-//           const likesSet = new Set(post.likes ?? []);
-//           if (likesSet.has(authUserId)) {
-//             likesSet.delete(authUserId);
-//           } else {
-//             likesSet.add(authUserId);
-//           }
-
-//           return {
-//             ...post,
-//             likes: Array.from(likesSet),
-//           };
-//         }),
-//       }));
-
-//       return { previousPosts };
-//     },
-
-//     onError: (error, __, context) => {
-//       if (context?.previousPosts) {
-//         queryClient.setQueryData(["posts", "posts/all"], context.previousPosts);
-//       }
-//       console.log(error);
-//       toast.error(error?.response?.data?.message || "Something went wrong");
-//     },
-
-//     onSuccess: (data, postId) => {
-//       queryClient.setQueryData(["posts", "posts/all"], (old = {}) => ({
-//         ...old,
-//         data: (old.data || []).map((post) => {
-//           if (post._id !== postId) return post;
-//           return {
-//             ...post,
-//             likes: data ?? [],
-//           };
-//         }),
-//       }));
-//     },
-//   });
-// };
-
-// export default useLikeOrUnlikePost;
-
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likeOrUnLikePost } from "../../services/tweetService";
-import toast from "react-hot-toast";
+import { likeOrUnlikePost } from "../../services/tweetService.js";
 
 const useLikeOrUnlikePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (postId) => likeOrUnLikePost(postId),
+    mutationFn: ({ postId }) => likeOrUnlikePost(postId),
 
-    onMutate: async (postId) => {
-      await queryClient.cancelQueries(["posts", "posts/all"]);
+    // onMutate: async ({ postId, userId }) => {
+    //   await queryClient.cancelQueries(["posts", "posts/all"]);
 
-      const previousPosts = queryClient.getQueryData(["posts", "posts/all"]);
-      const authUser = queryClient.getQueryData(["authUser"])?.data;
-      const authUserId = authUser?._id;
+    //   // جِيب نسخة من البوستات
+    //   const previousPosts = queryClient.getQueryData(["posts", "posts/all"]);
 
-      if (!authUserId) return { previousPosts };
+    //   // OPTIMISTIC UPDATE
+    //   queryClient.setQueryData(["posts", "posts/all"], (oldData) => {
+    //     if (!oldData?.data) return oldData;
 
-      queryClient.setQueryData(["posts", "posts/all"], (old = {}) => ({
-        ...old,
-        data: (old.data || []).map((post) => {
-          if (post._id !== postId) return post;
+    //     return {
+    //       ...oldData,
+    //       data: oldData.data.map((post) => {
+    //         if (post._id !== postId) return post;
 
-          const likesSet = new Set(post.likes ?? []);
-          likesSet.has(authUserId)
-            ? likesSet.delete(authUserId)
-            : likesSet.add(authUserId);
+    //         // هل اليوزر عامل لايك قبل كدا؟
+    //         const alreadyLiked = post.likes.includes(userId);
 
-          return {
-            ...post,
-            likes: Array.from(likesSet),
-          };
-        }),
-      }));
+    //         return {
+    //           ...post,
+    //           likes: alreadyLiked
+    //             ? post.likes.filter((id) => id !== userId) // unlike
+    //             : [...post.likes, userId], // like
+    //         };
+    //       }),
+    //     };
+    //   });
 
-      return { previousPosts };
-    },
+    //   return { previousPosts };
+    // },
 
-    onError: (error, __, context) => {
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["posts", "posts/all"], context.previousPosts);
-      }
-      toast.error(error?.response?.data?.message || "Something went wrong");
-    },
+    // onError: (_error, _vars, ctx) => {
+    //   queryClient.setQueryData(["posts", "posts/all"], ctx.previousPosts);
+    // },
 
-    onSuccess: (data, postId) => {
-      queryClient.setQueryData(["posts", "posts/all"], (old = {}) => ({
-        ...old,
-        data: (old.data || []).map((post) => {
-          if (post._id !== postId) return post;
-          return { ...post, likes: data ?? [] };
-        }),
-      }));
+    onSuccess: (data = {}, postId) => {
+      const { likes: updatedLikes } = data;
+
+      queryClient.setQueryData(["posts", "posts/all"], (oldData) => {
+        if (!oldData || !oldData.data) return oldData;
+
+        return {
+          ...oldData,
+          data: oldData.data.map((p) => {
+            if (p._id === postId._id) {
+              return { ...p, likes: updatedLikes };
+            }
+            return p;
+          }),
+        };
+      });
     },
   });
 };

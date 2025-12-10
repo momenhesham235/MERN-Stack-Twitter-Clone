@@ -18,10 +18,7 @@ export const deletePost = async (postId) => {
 };
 
 // LIKE or UNLIKE post
-export const likeOrUnLikePost = async (postId) => {
-
+export const likeOrUnlikePost = async (postId) => {
   const { data } = await api.post(`/posts/like/${postId}`);
   return data;
 };
-
-

@@ -1,83 +1,78 @@
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-// import { deletePost } from "../../services/tweetService.js";
-// import toast from "react-hot-toast";
-
-// export const useDeletePost = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: (postId) => deletePost(postId),
-
-//     // 1️⃣ Optimistic Update قبل الـ API
-//     onMutate: async (postId) => {
-//       await queryClient.cancelQueries({ queryKey: ["posts"] });
-
-//       // خزن كل النسخ القديمة للـ rollback
-//       const previousPosts = queryClient.getQueriesData({ queryKey: ["posts"] });
-
-//       // تحديث الـ cache فورياً
-//       queryClient.setQueriesData({ queryKey: ["posts"] }, (old = []) => {
-//         if (!old) return old;
-
-//         // لو old object فيه data (مثل pagination)
-//         if (Array.isArray(old)) {
-//           return old.filter((post) => post._id !== postId);
-//         } else if (old.data) {
-//           return {
-//             ...old,
-//             data: old.data.filter((post) => post._id !== postId),
-//           };
-//         }
-//         return old;
-//       });
-
-//       return { previousPosts };
-//     },
-
-//     // 2️⃣ لو حصل Error → rollback
-//     onError: (error, postId, context) => {
-//       if (context?.previousPosts) {
-//         context.previousPosts.forEach(([key, data]) => {
-//           queryClient.setQueryData(key, data);
-//         });
-//       }
-//       toast.error(error.response?.data?.message || "Failed to delete post");
-//     },
-
-//     // 3️⃣ لو Success → رسالة تأكيد
-//     onSuccess: (data) => {
-//       toast.success(data.message || "Post deleted successfully");
-//     },
-//   });
-// };
-
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deletePost } from "../../services/tweetService.js";
 import toast from "react-hot-toast";
 
- const useDeletePost = () => {
+const useDeletePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (postId) => deletePost(postId),
-
     onMutate: async (postId) => {
-      await queryClient.cancelQueries(["posts", "posts/all"]);
-      const previousPosts = queryClient.getQueryData(["posts", "posts/all"]);
+      const authUser = queryClient.getQueryData(["authUser"])?.data;
+
+      // Promise.all([
+      //   queryClient.cancelQueries(["posts", "posts/all"]),
+      //   queryClient.cancelQueries([
+      //     "posts",
+      //     `posts/user/${authUser?.username}`,
+      //   ]),
+      //   queryClient.cancelQueries(["posts", `posts/likes/${authUser?._id}`]),
+      // ]);
+
+      const previousPostsAll = queryClient.getQueryData(["posts", "posts/all"]);
+      const previousPostsUser = queryClient.getQueryData([
+        "posts",
+        `posts/user/${authUser?.username}`,
+      ]);
+      const previousPostsLikes = queryClient.getQueryData([
+        "posts",
+        `posts/likes/${authUser?._id}`,
+      ]);
 
       queryClient.setQueryData(["posts", "posts/all"], (old = {}) => ({
         ...old,
         data: (old.data || []).filter((post) => post._id !== postId),
       }));
 
-      return { previousPosts };
+      queryClient.setQueryData(
+        ["posts", `posts/user/${authUser?.username}`],
+        (old = {}) => ({
+          ...old,
+          data: (old.data || []).filter((post) => post._id !== postId),
+        })
+      );
+
+      queryClient.setQueryData(
+        ["posts", `posts/likes/${authUser?._id}`],
+        (old = {}) => ({
+          ...old,
+          data: (old.data || []).filter((post) => post._id !== postId),
+        })
+      );
+
+      return { previousPostsAll, previousPostsUser, previousPostsLikes };
     },
 
     onError: (error, __, context) => {
-      if (context?.previousPosts) {
-        queryClient.setQueryData(["posts", "posts/all"], context.previousPosts);
+      const authUser = queryClient.getQueryData(["authUser"])?.data;
+
+      if (context?.previousPostsAll) {
+        queryClient.setQueryData(
+          ["posts", "posts/all"],
+          context.previousPostsAll
+        );
+
+        queryClient.setQueryData(
+          ["posts", `posts/user/${authUser?.username}`],
+          context.previousPostsUser
+        );
+
+        queryClient.setQueryData(
+          ["posts", `posts/likes/${authUser?._id}`],
+          context.previousPostsLikes
+        );
       }
+
       toast.error(error?.response?.data?.message || "Failed to delete post");
     },
 
@@ -88,4 +83,3 @@ import toast from "react-hot-toast";
 };
 
 export default useDeletePost;
-

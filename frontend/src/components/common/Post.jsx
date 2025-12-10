@@ -20,6 +20,8 @@ const Post = ({ post = {} }) => {
   const { mutate: likePostMutate, isPending: isLiking } = useLikeOrUnLikePost();
 
   const isLiked = post.likes?.includes(authUser?.data?._id);
+  // console.log(post.likes);
+
   const isMyPost = authUser?.data?._id === post.user?._id;
   const postOwner = post.user || {};
 
@@ -33,7 +35,7 @@ const Post = ({ post = {} }) => {
 
   const handleLikePost = () => {
     if (isLiking) return;
-    likePostMutate(post._id);
+    likePostMutate({ postId: post._id });
   };
 
   const [comment, setComment] = useState("");

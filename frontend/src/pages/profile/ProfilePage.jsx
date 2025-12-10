@@ -47,9 +47,10 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    setFeedType(`posts/user/${username}`);
-  }, [username, feedType]);
-
+    if (feedType === `posts/user/${username}`)
+      setFeedType(`posts/user/${username}`);
+    else setFeedType(`posts/likes/${user?._id}`);
+  }, [username, feedType, user?._id]);
 
   return (
     <>
@@ -207,10 +208,10 @@ const ProfilePage = () => {
                 </div>
                 <div
                   className="flex justify-center flex-1 p-3 text-slate-500 hover:bg-secondary transition duration-300 relative cursor-pointer"
-                  onClick={() => setFeedType(`likes/${user?._id}`)}
+                  onClick={() => setFeedType(`posts/likes/${user?._id}`)}
                 >
                   Likes
-                  {feedType === `likes/${user?._id}` && (
+                  {feedType === `posts/likes/${user?._id}` && (
                     <div className="absolute bottom-0 w-10  h-1 rounded-full bg-primary" />
                   )}
                 </div>
