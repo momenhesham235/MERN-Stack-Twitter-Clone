@@ -155,9 +155,10 @@ export const deletePost = asyncHandler(async (req, res) => {
     await cloudinary.uploader.destroy(publicId);
   }
 
-  await Post.findByIdAndDelete(req.params.id);
+  // delete comments
+  await Comment.deleteMany({ postid: post._id });
 
-  await Comment.deleteMany({ post: req.params.id });
+  await Post.findByIdAndDelete(req.params.id);
 
   res
     .status(200)

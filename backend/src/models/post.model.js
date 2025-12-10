@@ -28,12 +28,22 @@ const postSchema = new mongoose.Schema(
   }
 );
 
+
+// postSchema.pre("findOneAndDelete", async function (next) {
+//   const postId = this.getQuery()["_id"];
+//   await Comment.deleteMany({ postid: postId });
+//   next();
+// });
+
+
 // Virtual populate for comments
 postSchema.virtual("comments", {
   ref: "Comment",
   foreignField: "postid",
   localField: "_id",
 });
+
+
 
 const Post = mongoose.model("Post", postSchema);
 

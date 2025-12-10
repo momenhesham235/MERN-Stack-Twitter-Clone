@@ -5,13 +5,6 @@ export const getPosts = async (type = "posts/all") => {
   const { data } = await api.get(`/${type}`);
   return data;
 };
-
-// GET following posts
-export const getFollowingPosts = async () => {
-  const res = await api.get("/posts/following");
-  return res.data;
-};
-
 // CREATE post
 export const createPost = async (postData) => {
   const res = await api.post("/posts/create", postData);
@@ -30,3 +23,5 @@ export const likeOrUnLikePost = async (postId) => {
   const { data } = await api.post(`/posts/like/${postId}`);
   return data;
 };
+
+

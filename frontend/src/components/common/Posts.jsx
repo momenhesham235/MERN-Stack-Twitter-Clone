@@ -13,6 +13,7 @@ const Posts = ({ feedType, username }) => {
 
   const POSTS = posts?.data;
 
+
   useEffect(() => {
     refetch();
   }, [feedType, username, refetch]);

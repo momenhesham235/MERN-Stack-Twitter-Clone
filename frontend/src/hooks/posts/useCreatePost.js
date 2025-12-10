@@ -34,7 +34,6 @@ const useCreatePost = () => {
               isOptimistic: true,
               likes: [],
               comments: [],
-              // User object MUST MATCH real backend shape
               user: {
                 _id: authUser?._id,
                 username: authUser?.username,

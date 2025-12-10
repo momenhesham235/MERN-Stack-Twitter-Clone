@@ -12,7 +12,7 @@ function validateCreateComment(obj) {
 // Validate Update Comment
 function validateUpdateComment(obj) {
   const schema = joi.object({
-    text: joi.string().trim().required(),
+    content: joi.string().trim().required(),
   });
   return schema.validate(obj);
 }

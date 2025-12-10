@@ -1,4 +1,4 @@
-import { FaRegComment } from "react-icons/fa";
+import { FaEdit, FaRegComment } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
@@ -10,32 +10,57 @@ import { formatPostDate } from "../../utils/date";
 import useDeletePost from "../../hooks/posts/useDeletePost";
 import LoadingSpinner from "./LoadingSpinner";
 import useLikeOrUnLikePost from "../../hooks/posts/useLikeOrUnlikePost";
+import useCreateComment from "../../hooks/comments/useCreateComment";
+import useDeleteComment from "../../hooks/comments/useDeleteComment";
+import { useUpdateComment } from "../../hooks/comments/useUpdateComment";
 
 const Post = ({ post = {} }) => {
   const { data: authUser } = useGetMe();
-
   const { mutate: deletePostMutate, isPending: isDeleting } = useDeletePost();
+  const { mutate: likePostMutate, isPending: isLiking } = useLikeOrUnLikePost();
+
+  const isLiked = post.likes?.includes(authUser?.data?._id);
+  const isMyPost = authUser?.data?._id === post.user?._id;
+  const postOwner = post.user || {};
+
+  const formattedDate = formatPostDate(post.createdAt);
+
   const handleDeletePost = () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       deletePostMutate(post._id);
     }
   };
 
-  const { mutate: likePostMutate, isPending: isLiking } = useLikeOrUnLikePost();
-  const isLiked = post.likes?.includes(authUser?.data?._id);
   const handleLikePost = () => {
     if (isLiking) return;
     likePostMutate(post._id);
   };
 
-  const isMyPost = authUser?.data?._id === post.user?._id;
-  const formattedDate = formatPostDate(post.createdAt);
-  const postOwner = post.user || {};
-
   const [comment, setComment] = useState("");
-  const isCommenting = false;
-  const handlePostComment = (e) => {
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editValue, setEditValue] = useState("");
+  const { mutate: createCommentMutate, isLoading: isCreating } =
+    useCreateComment();
+  const { mutate: deleteCommentMutate } = useDeleteComment();
+  const { mutate: updateComment } = useUpdateComment(post._id);
+
+  const handleAddComment = (e) => {
     e.preventDefault();
+    if (!comment.trim()) return;
+    createCommentMutate({ content: comment, postid: post._id });
+    setComment("");
+  };
+
+  const handleEditComment = (comment, content) => {
+    updateComment({
+      commentId: comment._id,
+      updatedContent: content,
+    });
+  };
+
+  const handleDeleteComment = (commentId) => {
+    if (!window.confirm("Delete this comment?")) return;
+    deleteCommentMutate(commentId);
   };
 
   return (
@@ -111,61 +136,117 @@ const Post = ({ post = {} }) => {
               >
                 <div className="modal-box rounded border border-gray-600">
                   <h3 className="font-bold text-lg mb-4">COMMENTS</h3>
+
                   <div className="flex flex-col gap-3 max-h-60 overflow-auto">
-                    {post.comments.length === 0 && (
+                    {post.comments?.length === 0 && (
                       <p className="text-sm text-slate-500">
                         No comments yet 🤔 Be the first one 😉
                       </p>
                     )}
-                    {post.comments.map((comment) => (
-                      <div key={comment._id} className="flex gap-2 items-start">
+
+                    {post.comments?.map((c) => (
+                      <div key={c._id} className="flex gap-2 items-start">
                         <div className="avatar">
-                          <div className="w-8 rounded-full">
+                          <div className="w-8 rounded-full overflow-hidden">
                             <img
                               src={
-                                comment.user.profileImg ||
+                                c.userid?.profileImg ||
                                 "src/assets/images/avatar-placeholder.png"
                               }
+                              alt=""
                             />
                           </div>
                         </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-1">
+
+                        <div className="flex flex-col flex-1">
+                          <div className="flex items-center justify-between gap-2">
                             <span className="font-bold">
-                              {comment.user.fullname}
+                              {c.userid?.fullname}
                             </span>
                             <span className="text-gray-700 text-sm">
-                              @{comment.user.username}
+                              @{c.userid?.username}
                             </span>
+
+                            {authUser?.data?._id === c.userid?._id && (
+                              <div className="flex gap-2">
+                                <FaTrash
+                                  className="cursor-pointer text-red-500"
+                                  onClick={() => handleDeleteComment(c._id)}
+                                />
+                                <FaEdit
+                                  className="cursor-pointer text-sky-400"
+                                  onClick={() => {
+                                    setEditingCommentId(c._id);
+                                    setEditValue(c.content); // مهم: تعبي النص الحالي في حقل الإدخال
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
-                          <div className="text-sm">{comment.text}</div>
+
+                          {/* Edit comment */}
+                          {editingCommentId === c._id ? (
+                            <div className="flex gap-2 mt-1">
+                              <input
+                                className="input input-bordered w-full"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                              />
+                              <button
+                                type="button" // مهم: type button لتجنب form submit
+                                className="btn btn-sm btn-primary"
+                                onClick={() => {
+                                  handleEditComment(c, editValue);
+                                  setEditingCommentId(null); // خروج من وضع التعديل
+                                  setEditValue(""); // مسح الحقل
+                                }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-ghost"
+                                onClick={() => {
+                                  setEditingCommentId(null);
+                                  setEditValue("");
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-sm">{c.content}</div>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
+
                   <form
                     className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2"
-                    onSubmit={handlePostComment}
+                    onSubmit={handleAddComment}
                   >
                     <textarea
-                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
+                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none border-gray-800"
                       placeholder="Add a comment..."
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                     />
-                    <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isCommenting ? (
-                        <span className="loading loading-spinner loading-md"></span>
-                      ) : (
-                        "Post"
-                      )}
+                    <button
+                      type="submit"
+                      className="btn btn-primary rounded-full btn-sm text-white px-4"
+                      disabled={isCreating}
+                    >
+                      {isCreating ? "Posting..." : "Post"}
                     </button>
                   </form>
                 </div>
+
                 <form method="dialog" className="modal-backdrop">
                   <button className="outline-none">close</button>
                 </form>
               </dialog>
+
               <div className="flex gap-1 items-center group cursor-pointer">
                 <BiRepost className="w-6 h-6  text-slate-500 group-hover:text-green-500" />
                 <span className="text-sm text-slate-500 group-hover:text-green-500">

@@ -77,6 +77,8 @@ export const deleteComment = asyncHandler(async (req, res) => {
 export const updateComment = asyncHandler(async (req, res) => {
   const commentId = req.params.id;
   const { error } = validateUpdateComment(req.body);
+  console.log(error  );
+  
   if (error) {
     return res
       .status(400)
