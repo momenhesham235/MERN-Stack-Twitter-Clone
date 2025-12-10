@@ -7,12 +7,13 @@ import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import useGetMe from "../../hooks/auth/useGetMe.js";
+import useNotifications from "../../hooks/notifications/useGetNotifications.js";
 
 const Sidebar = () => {
   const { mutate } = useLogout();
 
   const { data: authUser } = useGetMe();
-
+  const { data: notifications = [] } = useNotifications();
   const handleLogout = (e) => {
     e.preventDefault();
     mutate();
@@ -34,13 +35,19 @@ const Sidebar = () => {
               <span className="text-lg hidden md:block">Home</span>
             </Link>
           </li>
-          <li className="flex justify-center md:justify-start">
+
+          <li className="flex justify-center md:justify-start relative">
             <Link
               to="/notifications"
               className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
             >
               <IoNotifications className="w-6 h-6" />
               <span className="text-lg hidden md:block">Notifications</span>
+
+              {/* 🔴 Dot for unread notifications */}
+              {notifications.some((n) => !n.read) && (
+                <span className="absolute top-2 right-2 w-2 h-2 bg-sky-500 rounded-full"></span>
+              )}
             </Link>
           </li>
 
