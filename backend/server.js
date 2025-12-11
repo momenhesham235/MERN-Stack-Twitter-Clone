@@ -11,11 +11,13 @@ import slowDown from "express-slow-down";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 
+import path from "path";
+
 import morganMiddleware from "./src/middlewares/morgan.js";
 import mainRouters from "./src/routes/index.router.js";
 
 // Load env first
-dotenv.config({ path: "backend/src/config/.env" });
+dotenv.config({ path: ".env" });
 
 // Connect DB
 import "./src/config/database.js";
@@ -31,6 +33,8 @@ app.use(
     credentials: true, // Cookies
   })
 );
+
+const __dirname = path.resolve();
 
 // Middlewares
 app.use(express.json({ limit: "50mb" })); // For parsing application/json
@@ -71,6 +75,13 @@ cloudinary.config({
 });
 
 mainRouters(app);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

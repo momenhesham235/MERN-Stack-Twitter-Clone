@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-dotenv.config({ path: "backend/src/config/.env" });
+dotenv.config({ path: ".env" });
 
 class DatabaseSingleton {
   constructor() {
@@ -18,7 +18,7 @@ class DatabaseSingleton {
 
       if (!uri) throw new Error("❌ MONGO_URI missing in .env");
 
-      const conn = await mongoose.connect(uri );
+      const conn = await mongoose.connect(uri);
       console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (err) {
       console.error("❌ MongoDB Connection Error:", err.message);

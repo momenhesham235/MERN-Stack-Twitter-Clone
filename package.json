@@ -4,8 +4,9 @@
   "description": "MERN Stack Twitter: Build and Deploy a Full Stack Twitter Clone with React, Node.js and MongoDB",
   "main": "backend/server.js",
   "scripts": {
+    "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
   "author": "",
