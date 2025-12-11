@@ -3,7 +3,6 @@ import api from "./api"; // Axios instance
 // Create comment
 export const createComment = async (commentData) => {
   const { data } = await api.post("/comments", commentData);
-  console.log(data.data.userid);
   return data;
 };
 
@@ -16,6 +15,5 @@ export const deleteComment = async (commentId) => {
 // Update comment
 export const updateComment = async (commentId, content) => {
   const { data } = await api.patch(`/comments/${commentId}`, { content });
-  console.log(data);
   return data;
 };

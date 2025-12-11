@@ -109,7 +109,6 @@ export const login = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Invalid username or email" });
   }
 
-  console.log(user);
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {

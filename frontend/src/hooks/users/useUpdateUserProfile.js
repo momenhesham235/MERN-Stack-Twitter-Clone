@@ -11,7 +11,6 @@ const useUpdateUserProfile = () => {
     onMutate: async (formData) => {
       const authUser = queryClient.getQueryData(["authUser"])?.data;
 
-      console.log(authUser);
 
       Promise.all([
         queryClient.cancelQueries(["authUser"]),
