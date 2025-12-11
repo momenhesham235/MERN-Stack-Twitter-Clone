@@ -1,18 +1,38 @@
 import { useState } from "react";
+import useUpdateUserProfile from "../../hooks/users/useUpdateUserProfile";
 
 const EditProfileModal = () => {
   const [formData, setFormData] = useState({
-    fullname: "",
     username: "",
+    fullname: "",
     email: "",
+    currentPassword: "",
+    newPassword: "",
     bio: "",
     link: "",
-    newPassword: "",
-    currentPassword: "",
   });
+
+  const { mutate: updateProfile, isPending: isUpdating } =
+    useUpdateUserProfile();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleEditProfile = (e) => {
+    e.preventDefault();
+
+    const filtered = Object.fromEntries(
+      Object.entries(formData).filter(
+        ([_, v]) => v !== "" && v !== null && v !== undefined
+      )
+    );
+
+    if (Object.keys(filtered).length === 0) {
+      return alert("Please fill at least one field");
+    }
+
+    updateProfile(filtered);
   };
 
   return (
@@ -28,13 +48,7 @@ const EditProfileModal = () => {
       <dialog id="edit_profile_modal" className="modal">
         <div className="modal-box border rounded-md border-gray-700 shadow-md">
           <h3 className="font-bold text-lg my-3">Update Profile</h3>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Profile updated successfully");
-            }}
-          >
+          <form className="flex flex-col gap-4" onSubmit={handleEditProfile}>
             <div className="flex flex-wrap gap-2">
               <input
                 type="text"
@@ -97,7 +111,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+              {isUpdating ? "Updating..." : "Update"}
             </button>
           </form>
         </div>

@@ -66,3 +66,10 @@ export const followOrUnfollowUser = async (id) => {
   const res = await api.post(`/users/follow/${id}`);
   return res.data;
 };
+
+export const updateUserProfile = async (formData) => {
+  console.log(formData);
+  const res = await api.patch("/users/update", formData);
+  console.log(res.data);
+  return res.data;
+};

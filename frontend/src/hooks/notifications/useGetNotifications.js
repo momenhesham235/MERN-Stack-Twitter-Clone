@@ -6,6 +6,9 @@ const useNotifications = () => {
   return useQuery({
     queryKey: ["notifications"],
     queryFn: () => getNotifications(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
   });
 };
 

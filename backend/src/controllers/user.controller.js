@@ -143,14 +143,16 @@ export const getSuggestedUsers = asyncHandler(async (req, res) => {
 
 export const updateUserProfile = asyncHandler(async (req, res) => {
   const { error } = validateUpdateUser(req.body);
+
   if (error) {
     return res
       .status(400)
       .json({ status: STATUS.FAIL, message: error.details[0].message });
   }
 
-  const { username, fullName, email, currentPassword, newPassword, bio, link } =
+  const { username, fullname, email, currentPassword, newPassword, bio, link } =
     req.body;
+
   let { profileImg, coverImg } = req.body;
   const userId = req.user._id;
 
@@ -161,12 +163,18 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
       .json({ status: STATUS.FAIL, message: "User not found" });
   }
 
-  const isMatch = await bcrypt.compare(currentPassword, user.password);
-  if (!isMatch)
-    return res.status(400).json({ error: "Current password is incorrect" });
-
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(newPassword, salt);
+  if (currentPassword) {
+    const isPasswordCorrect = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordCorrect) {
+      return res.status(400).json({
+        status: STATUS.FAIL,
+        message: "Current password is incorrect",
+      });
+    }
+  }
 
   if (profileImg) {
     if (user.profileImg) {
@@ -195,7 +203,7 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
     userId,
     {
       ...(username && { username }),
-      ...(fullName && { fullname: fullName }),
+      ...(fullname && { fullname }),
       ...(email && { email }),
       ...(newPassword && { password: await bcrypt.hash(newPassword, 10) }),
       ...(bio !== undefined && { bio }),

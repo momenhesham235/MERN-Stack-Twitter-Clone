@@ -14,7 +14,8 @@ import { MdEdit } from "react-icons/md";
 import useGetMe from "../../hooks/auth/useGetMe";
 import useGetProfile from "../../hooks/users/useGetProfile";
 import useFollowOrUnfollowUser from "../../hooks/users/useFollowOrUnfollowUser";
-// import { formatMemberSinceDate } from "../../utils/date";
+import useUpdateUserProfile from "../../hooks/users/useUpdateUserProfile";
+import { formatMemberSinceDate } from "../../utils/date";
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -32,7 +33,7 @@ const ProfilePage = () => {
 
   const isMyProfile = authUser?.data._id === user?._id;
 
-  // const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+  const memberSinceDate = formatMemberSinceDate(user?.createdAt);
   const amIFollowing = authUser?.data?.following.includes(user?._id);
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
@@ -44,6 +45,15 @@ const ProfilePage = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const { mutate: updateProfile, isPending: isUpdatingProfile } =
+    useUpdateUserProfile();
+
+  const handleEditProfileImage = async () => {
+    await updateProfile({ coverImg, profileImg });
+    setProfileImg(null);
+    setCoverImg(null);
   };
 
   useEffect(() => {
@@ -70,14 +80,16 @@ const ProfilePage = () => {
                 <div className="flex flex-col">
                   <p className="font-bold text-lg">{user?.fullname}</p>
                   <span className="text-sm text-slate-500">
-                    {POSTS?.length} posts
+                    {user?.following.length} posts
                   </span>
                 </div>
               </div>
               {/* COVER IMG */}
               <div className="relative group/cover">
                 <img
-                  src={coverImg || user?.coverImg || "/cover.png"}
+                  src={
+                    coverImg || user?.coverImg || "src/assets/images/cover.png"
+                  }
                   className="h-52 w-full object-cover"
                   alt="cover image"
                 />
@@ -89,7 +101,6 @@ const ProfilePage = () => {
                     <MdEdit className="w-5 h-5 text-white" />
                   </div>
                 )}
-
                 <input
                   type="file"
                   hidden
@@ -124,7 +135,7 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div className="flex justify-end px-4 mt-5">
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && <EditProfileModal authUser={authUser.data} />}
                 {!isMyProfile && (
                   <button
                     className="btn btn-outline rounded-full btn-sm"
@@ -142,9 +153,9 @@ const ProfilePage = () => {
                 {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
-                    onClick={() => alert("Profile updated successfully")}
+                    onClick={handleEditProfileImage}
                   >
-                    Update
+                    {isUpdatingProfile ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>
@@ -177,7 +188,7 @@ const ProfilePage = () => {
                   <div className="flex gap-2 items-center">
                     <IoCalendarOutline className="w-4 h-4 text-slate-500" />
                     <span className="text-sm text-slate-500">
-                      Joined July 2021
+                      {memberSinceDate}
                     </span>
                   </div>
                 </div>

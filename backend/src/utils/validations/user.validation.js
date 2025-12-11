@@ -26,23 +26,86 @@ const validateLoginUser = (obj) => {
   return schema.validate(obj);
 };
 
-// validate Update User
 const validateUpdateUser = (obj) => {
   const schema = joi.object({
-    username: joi.string().trim().min(3).max(30),
-    fullName: joi.string().trim().min(3).max(50),
-    email: joi.string().trim().email().required(),
-    currentPassword: joi.string().trim().min(8).messages({
-      "string.min": "Current password must be at least 8 characters",
-    }),
-    newPassword: joi.string().trim().min(8).messages({
-      "string.min": "New password must be at least 8 characters",
-    }),
-    bio: joi.string().trim().max(160).allow(""),
-    link: joi.string().uri().trim().allow(""),
+    username: joi
+      .string()
+      .trim()
+      .min(3)
+      .max(30)
+      .messages({
+        "string.min": "Username must be at least 3 characters",
+        "string.max": "Username must be at most 30 characters",
+      })
+      .optional()
+      .allow(""),
+
+    fullname: joi
+      .string()
+      .trim()
+      .min(3)
+      .max(50)
+      .messages({
+        "string.min": "Full name must be at least 3 characters",
+        "string.max": "Full name must be at most 50 characters",
+      })
+      .optional()
+      .allow(""),
+
+    email: joi
+      .string()
+      .trim()
+      .email({ tlds: { allow: false } })
+      .messages({
+        "string.email": "Email must be a valid email address",
+      })
+      .optional()
+      .allow(""),
+
+    currentPassword: joi
+      .string()
+      .trim()
+      .min(8)
+      .messages({
+        "string.min": "Current password must be at least 8 characters",
+      })
+      .optional()
+      .allow(""),
+
+    newPassword: joi
+      .string()
+      .trim()
+      .min(8)
+      .messages({
+        "string.min": "New password must be at least 8 characters",
+      })
+      .optional()
+      .allow(""),
+
+    bio: joi
+      .string()
+      .trim()
+      .max(160)
+      .messages({
+        "string.max": "Bio must be at most 160 characters",
+      })
+      .optional()
+      .allow(""),
+
+    link: joi
+      .string()
+      .uri({ scheme: ["http", "https"] })
+      .trim()
+      .messages({
+        "string.uri": "Link must be a valid URL",
+      })
+      .optional()
+      .allow(""),
+    profileImg: joi.string().uri().optional().allow(""),
+    coverImg: joi.string().uri().optional().allow(""),
   });
 
-  return schema.validate(obj);
+  return schema.validate(obj, { abortEarly: false }); // هيرجع كل الأخطاء مرة واحدة
 };
 
 export { validateRegisterUser, validateLoginUser, validateUpdateUser };
